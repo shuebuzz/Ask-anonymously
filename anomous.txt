@@ -1,0 +1,89 @@
+<!DOCTYPE html><html>
+<head>
+  <title>Anonymous AMA</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 1rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: none;
+    }
+    button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #0088cc;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #ccc;
+    }
+    .status {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ask Me Anything</h1>
+  <div class="form-group">
+    <textarea id="question" placeholder="Type your anonymous question..."></textarea>
+  </div>
+  <button id="submitBtn">Submit</button>
+  <div class="status" id="status"></div>  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    document.getElementById("submitBtn").onclick = async function() {
+      const question = document.getElementById("question").value.trim();
+      if (!question) return;
+
+      document.getElementById("submitBtn").disabled = true;
+
+      try {
+        const res = await fetch("https://your-backend-api.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: tg.initDataUnsafe?.user?.id || null,
+            question: question
+          })
+        });
+
+        if (res.ok) {
+          document.getElementById("status").innerText = "Submitted anonymously!";
+          document.getElementById("question").value = "";
+        } else {
+          document.getElementById("status").innerText = "Submission failed. Try again.";
+        }
+      } catch (err) {
+        document.getElementById("status").innerText = "Network error.";
+      }
+
+      document.getElementById("submitBtn").disabled = false;
+    }
+  </script></body>
+</html>
